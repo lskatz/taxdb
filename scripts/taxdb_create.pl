@@ -45,7 +45,8 @@ sub main{
       tax_id        INTEGER PRIMARY KEY,
       name_txt      TEXT,
       unique_name   TEXT,
-      name_class    TEXT
+      name_class    TEXT,
+      FOREIGN KEY(tax_id) REFERENCES NODE(tax_id)
     );
   ));
   $sth2->execute();
