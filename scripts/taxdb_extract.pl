@@ -27,6 +27,7 @@ sub main{
       AutoCommit=> 0,
     }
   );
+  $dbh->do("PRAGMA foreign_keys = ON");
 
   my @descendent = ();
   my @topLevelTaxon = (); # user-specified taxids

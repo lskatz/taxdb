@@ -20,6 +20,7 @@ sub main{
   my $dbpath=$ARGV[0];
 
   my $dbh = DBI->connect("dbi:SQLite:dbname=$dbpath","","");
+  $dbh->do("PRAGMA foreign_keys = ON");
 
   my $sth = $dbh->prepare(qq(
     CREATE TABLE NODE(
@@ -35,7 +36,8 @@ sub main{
       inherited_mgc_flag             INTEGER,
       genbank_hidden_flag            INTEGER,
       hidden_subtree_root_flag       INTEGER,
-      comments                       TEXT
+      comments                       TEXT,
+      CONSTRAINT parent_tax_id_constraint FOREIGN KEY (parent_tax_id) REFERENCES NODE(tax_id) ON DELETE CASCADE ON UPDATE CASCADE
     );
   ));
   $sth->execute();
@@ -46,7 +48,7 @@ sub main{
       name_txt      TEXT,
       unique_name   TEXT,
       name_class    TEXT,
-      FOREIGN KEY(tax_id) REFERENCES NODE(tax_id)
+      FOREIGN KEY(tax_id) REFERENCES NODE(tax_id) ON DELETE CASCADE ON UPDATE CASCADE
     );
   ));
   $sth2->execute();

@@ -27,6 +27,7 @@ sub main{
       AutoCommit=> 0,
     }
   );
+  $dbh->do("PRAGMA foreign_keys = ON");
 
   # Don't save the nodes.dmp in memory but instead iterate
   # over each line.
@@ -53,7 +54,7 @@ sub main{
     $node_counter++;
 
     #last if($node_counter > 10);
-    if($node_counter % 10000 == 0){
+    if($node_counter % 100000 == 0){
       logmsg "Added $node_counter";
       $dbh->commit();
     }
