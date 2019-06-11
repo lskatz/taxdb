@@ -29,6 +29,7 @@ WriteMakefile1(
     'Data::Dumper'   => 0,
     'List::Util'     => 0,
     'DBI'            => 0,
+    'DBD::SQLite'    => 0,
   },
   BUILD_REQUIRES => {
     'Test::More'     => 0.47,
