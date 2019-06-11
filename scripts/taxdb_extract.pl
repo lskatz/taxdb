@@ -13,7 +13,8 @@ exit(main());
 
 sub main{
   my $settings={};
-  GetOptions($settings,qw(help taxon|taxa=s@)) or die $!;
+  GetOptions($settings,qw(help outdir=s taxon|taxa=s@)) or die $!;
+  $$settings{outdir} ||= './out';
 
   die usage() if(!@ARGV || $$settings{help});
   die "ERROR: need --taxon\n".usage() if(!$$settings{taxon});
@@ -70,7 +71,7 @@ sub main{
   # Now get the database corresponding to all descendent
   # and ancestor IDs
   
-  my $outdir = "./out";
+  my $outdir = $$settings{outdir};
   mkdir $outdir or die "ERROR: could not mkdir $outdir: $!";
   my @uniqTaxa = sort {$a<=>$b} uniq(@descendent, @ancestor);
   dumpTaxa(\@uniqTaxa, $dbh, $outdir, $settings);
@@ -160,6 +161,7 @@ sub usage{
   Usage: $0 [options] file.sqlite3
   --taxon     Taxon IDs.  Can specify multiple --taxon or
               comma-separate them, e.g., --taxon 1,2,3
+  --outdir    Output directory for flat files
   "
 }
 
