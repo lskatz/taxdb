@@ -5,6 +5,7 @@ use warnings;
 use Test::More tests => 3;
 use Data::Dumper;
 use Archive::Tar;
+use File::Copy qw/mv/;
 
 use IO::Uncompress::AnyUncompress qw/$AnyUncompressError/;
 
@@ -15,23 +16,27 @@ my $z = new IO::Uncompress::AnyUncompress($taxdumpTar)
 is $AnyUncompressError, '', "Read the taxdump file";
 
 my $tar = "data/taxdump-2019-06-11.tar";
-my @buffer = ();
-my $bufferCount = 0;
-open(my $outFh, ">", $tar) or die "ERROR: could not write to $tar: $!";
-while(my $line = <$z>){
-  push(@buffer, $line);
-  
-  if(++$bufferCount % 1000000 == 0){
-    my $str = join("", @buffer);
-    print $outFh $str;
-    @buffer = ();
-    note "Wrote ".length($str)." bytes from bz2 file";
+if(! -e $tar){
+  my @buffer = ();
+  my $bufferCount = 0;
+  open(my $outFh, ">", "$tar.tmp") or die "ERROR: could not write to $tar.tmp: $!";
+  while(my $line = <$z>){
+    push(@buffer, $line);
+    
+    if(++$bufferCount % 1000000 == 0){
+      my $str = join("", @buffer);
+      print $outFh $str;
+      @buffer = ();
+      note "Wrote ".length($str)." bytes from bz2 file";
+    }
   }
+  note "Writing the final bytes from the bz2 file into $tar";
+  print $outFh join("", @buffer);
+  @buffer=();
+  close $outFh;
+
+  mv("$tar.tmp", $tar) or die "ERROR moving $tar.tmp to $tar: $!";
 }
-note "Writing the final bytes from the bz2 file into $tar";
-print $outFh join("", @buffer);
-@buffer=();
-close $outFh;
 
 my $tarObj = Archive::Tar->new;
 $tarObj->read($tar);

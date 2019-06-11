@@ -5,6 +5,7 @@ use warnings;
 use DBI;
 use Getopt::Long qw/GetOptions/;
 use Data::Dumper;
+use List::Util qw/uniq/;
 
 sub logmsg{print STDERR "$0: @_\n";}
 
@@ -35,6 +36,7 @@ sub main{
   my $node_counter=0;
   my $manyQuestionmarkStr = '?,' x 13;
   $manyQuestionmarkStr=~s/,$//; # remove last comma
+  my %seenName;
   open(my $nodesFh,"$dbdir/nodes.dmp") or die "ERROR: could not read nodes.dmp: $!";
   while(my $nodesArr=taxonomyIterator($nodesFh,$settings)){
     my $taxid = $$nodesArr[0];
@@ -45,13 +47,15 @@ sub main{
     $sth->execute(@$nodesArr)
       or die "ERROR: with @$nodesArr ".$dbh->errstr();
 
-    for my $namesEntry(@{ $$names{$taxid} }){
+    for my $namesEntry(uniq(@{ $$names{$taxid} })){
+      next if($seenName{$taxid}{"@$namesEntry"}++);
+
       my $sth2 = $dbh->prepare(qq(
         INSERT INTO NAME(tax_id,name_txt,unique_name,name_class)
         VALUES(?,?,?,?);
       ));
       $sth2->execute($taxid, @$namesEntry)
-        or die "ERROR: ".$dbh->errstr();
+        or die "ERROR adding $taxid, @$namesEntry: ".$dbh->errstr();
     }
 
     $node_counter++;
