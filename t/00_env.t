@@ -25,15 +25,19 @@ while(my $line = <$z>){
     my $str = join("", @buffer);
     print $outFh $str;
     @buffer = ();
+    note "Wrote ".length($str)." bytes from bz2 file";
   }
 }
+note "Writing the final bytes from the bz2 file into $tar";
 print $outFh join("", @buffer);
 @buffer=();
 close $outFh;
 
 my $tarObj = Archive::Tar->new;
 $tarObj->read($tar);
+note "Decompressing nodes.dmp => data/nodes.dmp";
 $tarObj->extract_file("nodes.dmp", "data/nodes.dmp");
+note "Decompressing names.dmp => data/names.dmp";
 $tarObj->extract_file("names.dmp", "data/names.dmp");
 
 is((stat("data/nodes.dmp"))[7], 144069593, "File size of nodes.dmp");

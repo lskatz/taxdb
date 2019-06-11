@@ -5,10 +5,12 @@ use warnings;
 use Test::More tests => 3;
 use Data::Dumper;
 
+$|++;
 diag `perl scripts/taxdb_create.pl taxdb.sqlite 2>&1`;
 BAIL_OUT("ERROR with taxdb_create.pl: $!") if $?;
 diag `perl scripts/taxdb_add.pl    taxdb.sqlite data 2>&1`;
 BAIL_OUT("ERROR with taxdb_add.pl: $!") if $?;
+$|--;
 
 my $numNodes = `sqlite3 taxdb.sqlite 'SELECT count(tax_id) FROM NODE'`;
 my $numNames = `sqlite3 taxdb.sqlite 'SELECT count(tax_id) FROM NAME'`;
