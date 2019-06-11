@@ -44,11 +44,11 @@ sub main{
 
   my $sth2 = $dbh->prepare(qq(
     CREATE TABLE NAME(
-      name_id       INTEGER PRIMARY KEY AUTOINCREMENT,
       tax_id        INTEGER,
       name_txt      TEXT,
       unique_name   TEXT,
       name_class    TEXT,
+      PRIMARY KEY(tax_id, name_txt, unique_name, name_class),
       FOREIGN KEY(tax_id) REFERENCES NODE(tax_id) ON DELETE CASCADE ON UPDATE CASCADE
     );
   ));
