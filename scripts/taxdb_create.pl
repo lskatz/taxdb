@@ -44,7 +44,8 @@ sub main{
 
   my $sth2 = $dbh->prepare(qq(
     CREATE TABLE NAME(
-      tax_id        INTEGER PRIMARY KEY,
+      name_id       INTEGER PRIMARY KEY AUTOINCREMENT,
+      tax_id        INTEGER,
       name_txt      TEXT,
       unique_name   TEXT,
       name_class    TEXT,

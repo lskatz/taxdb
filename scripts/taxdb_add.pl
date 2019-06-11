@@ -18,7 +18,8 @@ sub main{
 
   my ($dbpath,$dbdir)=@ARGV;
 
-  my $names = readDmpHashOfArr("$dbdir/names.dmp",$settings);
+  #my $names = readDmpHashOfArr("$dbdir/names.dmp",$settings);
+  my $names = readNamesDmp("$dbdir/names.dmp",$settings);
   logmsg "Done reading names.  Now reading nodes and inserting.";
 
   # TODO foreign keys
@@ -44,12 +45,14 @@ sub main{
     $sth->execute(@$nodesArr)
       or die "ERROR: with @$nodesArr ".$dbh->errstr();
 
-    my $sth2 = $dbh->prepare(qq(
-      INSERT INTO NAME(tax_id,name_txt,unique_name,name_class)
-      VALUES(?,?,?,?);
-    ));
-    $sth2->execute($taxid, @{ $$names{$taxid} })
-      or die "ERROR: ".$dbh->errstr();
+    for my $namesEntry(@{ $$names{$taxid} }){
+      my $sth2 = $dbh->prepare(qq(
+        INSERT INTO NAME(tax_id,name_txt,unique_name,name_class)
+        VALUES(?,?,?,?);
+      ));
+      $sth2->execute($taxid, @$namesEntry)
+        or die "ERROR: ".$dbh->errstr();
+    }
 
     $node_counter++;
 
@@ -82,6 +85,22 @@ sub readDmpHashOfHash{
     # The entry's value will be an array with the ID
     # lopped off.
     $tax{$id}=\%F;
+  }
+  close $dmpFh;
+  return \%tax;
+}
+
+# Modified from readDmpHashOfArr() b/c tax_id is not unique
+# in names.dmp.
+sub readNamesDmp{
+  my($dmp, $settings) = @_;
+  my %tax;
+  open(my $dmpFh,$dmp) or die "ERROR reading $dmp: $!";
+  while(my $F=taxonomyIterator($dmpFh,$settings)){
+    # The entry's value will be an array with the ID
+    # lopped off.
+    my $taxid = shift(@$F);
+    push(@{ $tax{$taxid} }, $F);
   }
   close $dmpFh;
   return \%tax;
