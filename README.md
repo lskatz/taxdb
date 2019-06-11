@@ -1,5 +1,5 @@
 # taxdb
-Manipulate taxonomy databases
+Transform a taxonomy database into sqlite and manipulate it from there.
 
 ## Usage
 
