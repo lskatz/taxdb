@@ -61,7 +61,17 @@ sub deleteTaxa{
   my $res = $sth->execute(@$taxa)
     or die "ERROR: with deleting from NODE with @$taxa: ".$dbh->errstr();
 
-  print Dumper $res;
+  my $sth2 = $dbh->prepare(qq(
+    DELETE
+    FROM NAME
+    WHERE tax_id IN ($manyQuestionMarks)
+  )) 
+    or die "ERROR: with preparing DELETE from NAME with @$taxa: ".$dbh->errstr();
+
+  my $res2 = $sth2->execute(@$taxa)
+    or die "ERROR: with deleting from NODE with @$taxa: ".$dbh->errstr();
+
+  $dbh->commit();
 
   return $res;
 }
