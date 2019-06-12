@@ -28,6 +28,7 @@ WriteMakefile1(
     'File::Basename' => 0,
     'Data::Dumper'   => 0,
     'List::Util'     => 0,
+    'List::MoreUtils'=> 0,
     'DBI'            => 0,
     'DBD::SQLite'    => 0,
   },
