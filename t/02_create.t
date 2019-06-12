@@ -14,7 +14,7 @@ BAIL_OUT("ERROR with taxdb_add.pl $taxdb Listeria: $!") if $?;
 
 my $numNodes = `sqlite3 $taxdb 'SELECT count(tax_id) FROM NODE'`;
 my $numNames = `sqlite3 $taxdb 'SELECT count(tax_id) FROM NAME'`;
-my $numLmonoNames = `sqlite3 taxdb.sqlite 'SELECT count(*) FROM NAME WHERE tax_id = 1639;'`;
+my $numLmonoNames = `sqlite3 $taxdb 'SELECT count(*) FROM NAME WHERE tax_id = 1639;'`;
 chomp($numNodes,$numNames,$numLmonoNames);
 
 is $numNodes, 306, "Number of nodes";
