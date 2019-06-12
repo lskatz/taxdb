@@ -5,7 +5,7 @@ use warnings;
 use DBI;
 use Getopt::Long qw/GetOptions/;
 use Data::Dumper;
-use List::Util qw/uniq/;
+use List::MoreUtils qw/uniq/;
 
 sub logmsg{print STDERR "$0: @_\n";}
 
