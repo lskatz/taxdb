@@ -43,6 +43,6 @@ Create and add to a taxdb
 
 ## CONTRIBUTIONS
 
-    Please submit ideas as issues.  I usually accept pull requests as long as they pass the unit tests.
+Please submit ideas as issues.  I usually accept pull requests as long as they pass the unit tests.
 
 [![Build Status](https://travis-ci.com/lskatz/taxdb.svg?branch=master)](https://travis-ci.com/lskatz/taxdb)
