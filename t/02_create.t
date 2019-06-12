@@ -7,9 +7,9 @@ use Data::Dumper;
 
 my $taxdb = "Listeria.rebuilt.sqlite";
 unlink($taxdb); #force overwrite
-diag `perl scripts/taxdb_create.pl $taxdb 2>&1`;
+note `perl scripts/taxdb_create.pl $taxdb 2>&1`;
 BAIL_OUT("ERROR with taxdb_create.pl on $taxdb: $!") if $?;
-diag `perl scripts/taxdb_add.pl    $taxdb Listeria 2>&1`;
+note `perl scripts/taxdb_add.pl    $taxdb Listeria 2>&1`;
 BAIL_OUT("ERROR with taxdb_add.pl $taxdb Listeria: $!") if $?;
 
 my $numNodes = `sqlite3 $taxdb 'SELECT count(tax_id) FROM NODE'`;
