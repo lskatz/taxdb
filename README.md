@@ -31,7 +31,7 @@ Create and add to a taxdb
     perl scripts/taxdb_create.pl taxdb.sqlite
     perl scripts/taxdb_add.pl taxdb.sqlite flat/
 
-### Create a database for _Listeria monocytogenes_ (taxid: 1639)
+### Create a database for _Listeria monocytogenes_ (taxid: 1639) and its ancestor lineage
 
     perl scripts/taxdb_extract.pl --taxon 1639 taxdb.sqlite --outdir lmono.flat
     perl scripts/taxdb_create.pl lmono.sqlite
