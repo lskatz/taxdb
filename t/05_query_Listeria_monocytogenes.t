@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 2;
+use Test::More tests => 3;
 use Data::Dumper;
 
 my $taxdb = "data/Listeria-2019-06-12.sqlite";
@@ -16,4 +16,9 @@ if(!@stdout){
 my $sciNameLine = (grep {$_ =~ /scientific name/} @stdout)[0];
 my @sciNameLineArr = split(/\t/, $sciNameLine);
 is $sciNameLineArr[14], "Listeria monocytogenes", "Found the scientific name for taxid = 1639 (Listeria monocytogenes)";
+
+my $lineage = join("\t", qw(1639  1637    186820  1385    91061   1239    1783272 2       131567  1));
+my $obsLineage = `perl scripts/taxdb_query.pl --taxon 1639 $taxdb --mode lineage 2>data.tmp/query.log`;
+chomp($obsLineage);
+is $lineage, $obsLineage, "Lineage for Listeria monocytogenes";
 

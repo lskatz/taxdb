@@ -13,9 +13,11 @@ exit(main());
 
 sub main{
   my $settings={};
-  GetOptions($settings,qw(help sep|separator=s outdir=s taxon|taxa=s@)) or die $!;
+  GetOptions($settings,qw(help mode=s sep|separator=s outdir=s taxon|taxa=s@)) or die $!;
   $$settings{outdir} ||= './out';
   $$settings{sep} ||= "\t";
+  $$settings{mode}||= "default";
+  $$settings{mode} = lc($$settings{mode});
 
   die usage() if(!@ARGV || $$settings{help});
   die "ERROR: need --taxon\n".usage() if(!$$settings{taxon});
@@ -39,7 +41,21 @@ sub main{
     }
   }
 
-  my $manyQuestionMarks = '?,' x scalar(@topLevelTaxon);
+  if($$settings{mode} eq 'default'){
+    dumpTaxa(\@topLevelTaxon, $dbh, $settings);
+  } elsif($$settings{mode} eq 'lineage'){
+    dumpLineage(\@topLevelTaxon, $dbh, $settings);
+  }
+
+  $dbh->disconnect;
+
+  return 0;
+}
+
+sub dumpTaxa{
+  my($taxa, $dbh, $settings) = @_;
+
+  my $manyQuestionMarks = '?,' x scalar(@$taxa);
   $manyQuestionMarks=~s/,$//;
   my $sth = $dbh->prepare(qq(
     SELECT NODE.*, NAME.*
@@ -48,8 +64,8 @@ sub main{
   ))
     or die "ERROR preparing SELECT statement: ".$dbh->errstr();
 
-  my $res = $sth->execute(@topLevelTaxon)
-    or die "ERROR querying with @topLevelTaxon: ".$dbh->errstr();
+  my $res = $sth->execute(@$taxa)
+    or die "ERROR querying with @$taxa: ".$dbh->errstr();
 
   my $sep = $$settings{sep};
   print join($sep, @{ $sth->{NAME_lc} })."\n";
@@ -57,10 +73,50 @@ sub main{
     print join($sep, @row)."\n";
   }
 
-  $dbh->disconnect;
-
-  return 0;
+  return 1;
 }
+
+sub dumpLineage{
+  my($taxa, $dbh, $settings) = @_;
+
+  for my $taxon(@$taxa){
+    my $lineage = $taxon;
+    my $sth = $dbh->prepare(qq(
+      SELECT parent_tax_id
+      FROM NODE
+      WHERE NODE.tax_id = ?
+    ))
+      or die "ERROR preparing SELECT statement: ".$dbh->errstr();
+
+    my $res = $sth->execute($taxon)
+      or die "ERROR getting parent for $taxon: ".$dbh->errstr();
+
+    my @row = $sth->fetchrow_array();
+    my $parent = $row[0];
+    while($parent != $taxon){
+      $lineage .= "\t$parent";
+      $taxon = $parent;
+
+      my $sth2 = $dbh->prepare(qq(
+        SELECT parent_tax_id
+        FROM NODE
+        WHERE NODE.tax_id = ?
+      ))
+        or die "ERROR preparing SELECT statement: ".$dbh->errstr();
+
+      my $res2 = $sth2->execute($taxon)
+        or die "ERROR getting parent for $taxon: ".$dbh->errstr();
+
+      @row = $sth2->fetchrow_array();
+      $parent = $row[0];
+    }
+    print $lineage."\n";
+  }
+
+  return 1;
+}
+
+      
 
 sub usage{
   "Display the details on any given taxon
@@ -68,6 +124,7 @@ sub usage{
   --taxon     Taxon IDs.  Can specify multiple --taxon or
               comma-separate them, e.g., --taxon 1,2,3
   --separator By default, columns are tab-separated.
+  --mode      Either: default, lineage
   "
 }
 
