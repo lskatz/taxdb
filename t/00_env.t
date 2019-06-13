@@ -5,5 +5,8 @@ use warnings;
 use Test::More tests => 1;
 use Data::Dumper;
 
-diag "This is a dummy test as a placeholder in case I need to set up the environment in a test script";
-is 1,1,"Dummy test";
+system("perl t/900_cleanup.t >/dev/null 2>&1") or note "NOTE: preventative cleanup resulted in an error which might only mean that there was nothing to clean up.";
+
+my $bool = mkdir("data.tmp");
+is $bool, 1, "Make the temp directory for testing";
+

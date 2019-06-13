@@ -6,8 +6,8 @@ use Test::More tests => 3;
 use Data::Dumper;
 use File::Copy qw/cp/;
 
-my $taxdb = "Listeria-noLmono.rebuilt.sqlite";
-cp("Listeria.rebuilt.sqlite", $taxdb) or BAIL_OUT("ERROR: could not copy Listeria-noLmono.rebuilt.sqlite => $taxdb: $!");
+my $taxdb = "data.tmp/Listeria-noLmono.rebuilt.sqlite";
+cp("data.tmp/Listeria.rebuilt.sqlite", $taxdb) or BAIL_OUT("ERROR: could not copy data.tmp/Listeria-noLmono.rebuilt.sqlite => $taxdb: $!");
 
 my $stdout = `perl scripts/taxdb_delete.pl --taxon 1639 $taxdb 2>&1`;
 BAIL_OUT("Failed to delete 1639 (Listeria monocytogenes): $!  => $stdout") if $?;

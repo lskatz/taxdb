@@ -5,21 +5,22 @@ use warnings;
 use Test::More tests => 3;
 use Data::Dumper;
 
-my $taxdb = "Listeria.rebuilt.sqlite";
+my $taxdb = "data.tmp/Listeria.rebuilt.sqlite";
 
-for(glob("lmono.flat/*")){
+# Cleanup from any potential previous runs of this script
+for(glob("data.tmp/lmono.flat/*")){
   unlink($_);
 }
-rmdir "lmono.flat";
+rmdir "data.tmp/lmono.flat";
 
-note `perl scripts/taxdb_extract.pl --taxon 1639 $taxdb --outdir lmono.flat 2>&1`;
+note `perl scripts/taxdb_extract.pl --taxon 1639 $taxdb --outdir data.tmp/lmono.flat 2>&1`;
 BAIL_OUT("Failed to extract 1639 (Listeria monocytogenes): $!") if $?;
 
-my $taxdb2 = "lmono.sqlite";
+my $taxdb2 = "data.tmp/lmono.sqlite";
 unlink($taxdb2); # overwrite
 note `perl scripts/taxdb_create.pl $taxdb2 2>&1`;
 BAIL_OUT("Failed to create db $taxdb2: $!") if $?;
-note `perl scripts/taxdb_add.pl $taxdb2 lmono.flat 2>&1`;
+note `perl scripts/taxdb_add.pl $taxdb2 data.tmp/lmono.flat 2>&1`;
 BAIL_OUT("Failed to add 1639 (Listeria monocytogenes) to the new database: $!") if $?;
 
 my $numNodes = `sqlite3 $taxdb2 'SELECT count(tax_id) FROM NODE'`;
