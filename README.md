@@ -41,6 +41,41 @@ Create and add to a taxdb
 
     perl scripts/taxdb_dump.pl lmono.sqlite --outdir lmono.flat.replicate2
 
+### Query a taxon
+
+In the below examples with `taxdb_query.pl`, you can specify `--taxid` or `--name` for scientific names.
+
+    perl scripts/taxdb_query.pl --name "Listeria" data/Listeria-2019-06-12.sqlite |\
+      grep -m 1 "scientific name" |\
+      cut -f 1-3,15,16
+    # Results: `1637    186820  genus   Listeria`
+
+#### Find the lineage of the taxon
+
+    perl scripts/taxdb_query.pl --taxon 1639 --mode lineage data/Listeria-2019-06-12.sqlite
+    1639    1637    186820  1385    91061   1239    1783272 2       131567  1
+
+#### Find the lineage of the taxon but also get more details
+
+With a bash loop and some piping
+
+    for taxid in $(perl scripts/taxdb_query.pl --taxon 1639 --mode lineage data/Listeria-2019-06-12.sqlite); do 
+      perl scripts/taxdb_query.pl --taxon $taxid data/Listeria-2019-06-12.sqlite |\
+        grep -m 1 "scientific name"; 
+    done |\
+      cut -f 1-3,15,16 |\
+      column -ts $'\t'
+    1639     1637     species       Listeria monocytogenes
+    1637     186820   genus         Listeria
+    186820   1385     family        Listeriaceae
+    1385     91061    order         Bacillales
+    91061    1239     class         Bacilli
+    1239     1783272  phylum        Firmicutes
+    1783272  2        no rank       Terrabacteria group
+    2        131567   superkingdom  Bacteria                Bacteria <prokaryotes>
+    131567   1        no rank       cellular organisms
+    1        1        no rank       root
+
 ## Advanced
 
 If you are familiar with sqlite, you can run custom queries.
