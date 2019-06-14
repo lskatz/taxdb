@@ -51,7 +51,9 @@ sub dumpNCBI{
 
   open(my $nodesFh, ">", "$outdir/nodes.dmp") or die "ERROR: could not write to $outdir/nodes.dmp: $!";
   while(my @row = $sth->fetchrow_array()){
-    print $nodesFh join("\t|\t", @row)."\n";
+    my $line = join("\t|\t", @row).'|';
+    $line=~s/\|\t+\|$/|\t\t|/; # make sure that the last field, if blank, is represented by |\t\t|
+    print $nodesFh $line."\n";
   }
   close $nodesFh;
 
@@ -65,7 +67,9 @@ sub dumpNCBI{
 
   open(my $namesFh, ">", "$outdir/names.dmp") or die "ERROR: could not write to $outdir/names.dmp: $!";
   while(my @row = $sth2->fetchrow_array()){
-    print $namesFh join("\t|\t", @row)."\n";
+    my $line = join("\t|\t", @row).'|';
+    $line=~s/\|\t+\|$/|\t\t|/;
+    print $namesFh $line."\n";
   }
   close $namesFh;
 
