@@ -15,7 +15,7 @@ my $preop = 'true';
 
 WriteMakefile1(
   NAME         => 'TaxDB',
-  VERSION      => '0.2',
+  VERSION      => '0.3',
   AUTHOR => q{Lee S. Katz <gzu2@cdc.gov>},
   EXE_FILES    => [
     'scripts/taxdb_add.pl',
