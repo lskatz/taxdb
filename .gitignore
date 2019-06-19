@@ -33,3 +33,4 @@ inc/
 /MANIFEST.bak
 /pm_to_blib
 /*.zip
+data/taxdump-2019-06-11.tar.bz2
